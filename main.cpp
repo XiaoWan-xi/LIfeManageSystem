@@ -125,6 +125,7 @@ void showLog(){
 }
 void exitSys(){
     cout<<"感谢使用本系统\n";
+    waitForEnter();
     exit(0);
 }
 vector<string> split(const string& s , char c){
