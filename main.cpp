@@ -11,7 +11,6 @@ using namespace std;
 unordered_map<string,vector<string>> mymap;
 vector<string> logs;
 
-
 void readFromFile();
 void showMainMenu();
 void waitForEnter();
@@ -33,9 +32,14 @@ int main(){
     showMainMenu();
     choose();
 }
-void readFromFile(){
-    string line;
+void readFromFile(){    
     ifstream is("logs.txt");
+    if(!is.is_open()){
+        system("type nul > logs.txt");
+        is.open("logs.txt");
+    }
+
+    string line;
     while(getline(is,line)){
         auto strings = split(line, '&');
         string pathName=strings[2];
@@ -45,6 +49,7 @@ void readFromFile(){
         string log = day + "&" + time + "&" + message;
         mapAdd(pathName,log);
     }
+    is.close();
 }
 void showMainMenu(){
     cout<<"1.记录日志"<<endl;
@@ -77,6 +82,7 @@ void choose(){
     }
 }
 void addLog(){
+
     ofstream os("logs.txt",ios_base::app);
 
     cout<<"请输入路径名称(输入1返回):"<<endl;
@@ -100,6 +106,8 @@ void addLog(){
     string log2 = time + "&" + pathName + "&" + message + "\n" ;
     os << log2 ;
 
+    os.close();
+
 }
 void showPath(){
     cout<< "目前的路径有：\n";
@@ -114,9 +122,11 @@ void showContri(){
     }
 }
 void showLog(){
+
     ifstream is("logs.txt");
     if (!is.is_open()) {
-        cerr << "无法打开日志文件，请检查文件是否存在或路径是否正确。" << endl;
+        system("type nul > logs.txt");
+        is.open("logs.txt");
     }
 
     is.clear();
@@ -158,11 +168,11 @@ string getTime(){
 
 void mapAdd(string pathName,string log){
     if(mymap.count(pathName)==0){
-            vector<string> mylog;
-            mylog.push_back(log);
-            mymap.emplace(pathName,mylog);
-        }
-        else{
-            mymap.at(pathName).push_back(log);
-        }
+        vector<string> mylog;
+        mylog.push_back(log);
+        mymap.emplace(pathName,mylog);
+    }
+    else{
+        mymap.at(pathName).push_back(log);
+    }
 }
