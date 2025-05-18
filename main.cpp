@@ -4,14 +4,13 @@
 #include <fstream>
 #include <Windows.h>
 #include <stdlib.h>
+#include <algorithm>
 
 using namespace std;
 
 unordered_map<string,vector<string>> mymap;
 vector<string> logs;
 
-ifstream is("logs.txt");
-ofstream os("logs.txt",ios_base::app);
 
 void readFromFile();
 void showMainMenu();
@@ -36,13 +35,14 @@ int main(){
 }
 void readFromFile(){
     string line;
+    ifstream is("logs.txt");
     while(getline(is,line)){
-        auto strings = split(line, ' ');
+        auto strings = split(line, '&');
         string pathName=strings[2];
         string day=strings[0];
         string time=strings[1];
         string message = strings[3];
-        string log = day + " " + time + " " + message;
+        string log = day + "&" + time + "&" + message;
         mapAdd(pathName,log);
     }
 }
@@ -77,6 +77,8 @@ void choose(){
     }
 }
 void addLog(){
+    ofstream os("logs.txt",ios_base::app);
+
     cout<<"请输入路径名称(输入1返回):"<<endl;
     string pathName;
     cin>>pathName;
@@ -85,7 +87,8 @@ void addLog(){
 
     cout<<"请输入日志信息(输入1返回):"<<endl;
     string message;
-    cin>>message;
+    cin.ignore();
+    getline(cin, message);
 
     if(message == "1") return ;
 
@@ -94,7 +97,7 @@ void addLog(){
     string log1 = time + message;
     mapAdd(pathName,log1);
 
-    string log2 = time + " " + pathName + " " + message + "\n" ;
+    string log2 = time + "&" + pathName + "&" + message + "\n" ;
     os << log2 ;
 
 }
@@ -111,6 +114,7 @@ void showContri(){
     }
 }
 void showLog(){
+    ifstream is("logs.txt");
     if (!is.is_open()) {
         cerr << "无法打开日志文件，请检查文件是否存在或路径是否正确。" << endl;
     }
@@ -120,6 +124,7 @@ void showLog(){
     
     string line;
     while(getline(is,line)){
+        replace(line.begin(),line.end(),'&',' ');
         cout<<line <<endl;
     }
 }
@@ -146,7 +151,7 @@ vector<string> split(const string& s , char c){
 string getTime(){
     SYSTEMTIME t;
     GetLocalTime(&t); // 获取当前系统时间
-    string time = to_string(t.wYear) + "/" + to_string(t.wMonth) + "/" + to_string(t.wDay) + " " +
+    string time = to_string(t.wYear) + "/" + to_string(t.wMonth) + "/" + to_string(t.wDay) + "&" +
                     to_string(t.wHour) + ":" + to_string(t.wMinute) + ":" + to_string(t.wSecond);
     return time ;
 }
